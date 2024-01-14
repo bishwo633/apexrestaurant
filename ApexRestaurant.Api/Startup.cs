@@ -13,42 +13,57 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace ApexRestaurant.Api
+namespace ApexRestaurant.Api;
+
+public class Startup
 {
-    public class Startup
+    public IConfiguration Configuration { get; }
+    public Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
+        Configuration = configuration;
+    }
+
+    // This method gets called by the runtime. Use this method to add services to the container.
+    public void ConfigureServices(IServiceCollection services)
+    {
+        RepositoryModule.Register(services, Configuration.GetConnectionString("DefaultConnection"), GetType().Assembly.FullName);
+        ServicesModule.Register(services);
+        services.AddControllers();
+        services.AddSwaggerGen();
+        services.AddMvc(option => option.EnableEndpointRouting = false);
+        services.AddCors(allowsites =>
         {
-            Configuration = configuration;
+            allowsites.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
+        });
+    }
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+        else
+        {
+            app.UseHsts();
         }
 
-        public IConfiguration Configuration { get; }
+        app.UseHttpsRedirection();
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        app.UseRouting();
+
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints =>
         {
-            RepositoryModule.Register(services, 
-                Configuration.GetConnectionString("DefaultConnection"),
-                GetType().Assembly.FullName);
-            ServicesModule.Register(services);
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-        }
+            endpoints.MapControllers();
+            endpoints.MapDefaultControllerRoute();
+        });
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHsts();
-            }
-
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseMvc();
-        }
+        app.UseStaticFiles();
+        app.UseMvc();
+        app.UseCors(options => options.AllowAnyOrigin());
     }
 }
