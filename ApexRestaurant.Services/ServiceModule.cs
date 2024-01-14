@@ -1,13 +1,13 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using ApexRestaurant.Services.SCustomer;
 
-namespace ApexRestaurant.Services
+namespace ApexRestaurant.Services;
+
+public static class ServicesModule
 {
-    public static class ServicesModule
+    public static void Register(IServiceCollection services)
     {
-        public static void Register(IServiceCollection services)
-        {
-            services.AddTransient<ICustomerService, CustomerService>();
-        }
+        services.AddTransient<ICustomerService, CustomerService>();
+        services.AddTransient<ICustomerServiceAsync, CustomerServiceAsync>();
     }
 }
