@@ -6,6 +6,9 @@ This project demonstrates the building of a RESTful Web API with N-layers, e.g. 
 
 This can be used as a backend to build any type of application like desktop application.Web application (React UI, Angular UI, ASP.NET MVC/Core, Laravel, etc.), Mobile Application (Android, iOS, Windows Mobile, etc.)
 
+## Architecture
+![architecture.png](architecture.png)
+
 ## Setup
 1. Git clone
 ```
